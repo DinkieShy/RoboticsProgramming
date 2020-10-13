@@ -7,15 +7,12 @@ import time
 
 class Talker:
     def __init__(self):
-        rospy.init_node("FreeMemTalker", anonymous=True)
-        self.pub = rospy.Publisher('FreeMem', std_msgs.msg.UInt64, queue_size=0)
-        self.mem = psutil.virtual_memory()
-        self.lastPublished = 0
+        rospy.init_node("FreeMemTalker", anonymous=True) # Create node
+        self.pub = rospy.Publisher('FreeMem', std_msgs.msg.String, queue_size=0) # Create publisher to *use* the node
         
     def publish(self):
-        freeMem = self.mem.free
-        self.pub.publish(std_msgs.msg.UInt64(freeMem))
-        self.lastPublished = freeMem
+        freeMem = psutil.virtual_memory().free # psutil class to get current free memory
+        self.pub.publish(std_msgs.msg.String(str(freeMem))) # Publish the amount of free memory (as int64)
 
 talker = Talker()
 
