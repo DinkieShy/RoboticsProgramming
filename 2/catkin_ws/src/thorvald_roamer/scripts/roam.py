@@ -37,11 +37,13 @@ class RoamerMover:
         self.move(stringToPublish)
 
         minIndex = sweep.index(min(sweep)) # Find minimum value in array of distances, then get the index of that distance in the array
-        angle2D = minIndex*msg.angle_increment-(math.pi/2) # Multiply by ancle_increment parameter from scanner, and fix offset
+        angle2D = minIndex*msg.angle_increment + msg.angle_min # Multiply by ancle_increment parameter from scanner, and fix offset (msg.angle_min in this case is -pi/2, thanks Marc)
+
         angleTF = PoseStamped()
-        angleTF.header.frame_id = msg.header.frame_id # Set frame_id to be the scanner
+        angleTF.header = msg.header # Duplicate message header for time/frame_id from scanner
         angleTF.pose.orientation.z = math.sin(angle2D/2) # Convert from 2D angle to Quaternion (as done in Marc's lecture 3)
         angleTF.pose.orientation.w = math.cos(angle2D/2)
+        
         self.closestPointPub.publish(angleTF) # Publish to closestPoint topic
 
     def checkAreaClear(self, sweep, start, stop): # Returns false if any value between start and stop are below self.minRange, else true
