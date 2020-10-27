@@ -34,16 +34,15 @@ class RoamerMover:
         if self.checkAreaClear(sweep, len(sweep)/4, (3/4)*len(sweep)): # Check centre 3/4ths of sweep
             stringToPublish += "F"
 
-        # Something was close enough to cause turning
-        minIndex = sweep.index(min(sweep))
-        angle2D = minIndex*msg.angle_increment-(math.pi/2)
-        angleTF = PoseStamped()
-        angleTF.header.frame_id = msg.header.frame_id
-        angleTF.pose.orientation.z = math.sin(angle2D/2)
-        angleTF.pose.orientation.w = math.cos(angle2D/2)
-        self.closestPointPub.publish(angleTF)
-
         self.move(stringToPublish)
+
+        minIndex = sweep.index(min(sweep)) # Find minimum value in array of distances, then get the index of that distance in the array
+        angle2D = minIndex*msg.angle_increment-(math.pi/2) # Multiply by ancle_increment parameter from scanner, and fix offset
+        angleTF = PoseStamped()
+        angleTF.header.frame_id = msg.header.frame_id # Set frame_id to be the scanner
+        angleTF.pose.orientation.z = math.sin(angle2D/2) # Convert from 2D angle to Quaternion (as done in Marc's lecture 3)
+        angleTF.pose.orientation.w = math.cos(angle2D/2)
+        self.closestPointPub.publish(angleTF) # Publish to closestPoint topic
 
     def checkAreaClear(self, sweep, start, stop): # Returns false if any value between start and stop are below self.minRange, else true
         for i in range(start, stop):
