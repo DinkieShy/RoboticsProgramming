@@ -18,21 +18,21 @@ class RoamerMover:
         self.twistPub = rospy.Publisher("/thorvald_" + id + "/twist_mux/cmd_vel", Twist, queue_size=0)
         self.closestPointPub = rospy.Publisher("/thorvald_" + id + "/closestPoint", PoseStamped, queue_size=0)
         self.forwardRate = (2)
-        self.turnRate = (math.pi/2)
+        self.turnRate = (math.pi/2)/2
 
     def watch(self, msg):
         sweep = msg.ranges
         # sweep[0] is rightmost, sweep[len] is leftmost
         stringToPublish = ""
 
-        if self.checkAreaClear(sweep, 0, len(sweep)/4): # Check first 4th of sweep
+        if self.checkAreaClear(sweep, 0, (len(sweep))/6): # Check first 6th of sweep
             stringToPublish += "R"
 
-        if self.checkAreaClear(sweep, (3/4)*len(sweep), len(sweep)): # Check last 4th of sweep
-            stringToPublish += "L"
-
-        if self.checkAreaClear(sweep, len(sweep)/4, (3/4)*len(sweep)): # Check centre 3/4ths of sweep
+        if self.checkAreaClear(sweep, (2*len(sweep))/6, (4*len(sweep))/6): # Check centre 1/2th of sweep
             stringToPublish += "F"
+
+        if self.checkAreaClear(sweep, (5*len(sweep))/6, len(sweep)): # Check last 6th of sweep
+            stringToPublish += "L"
 
         self.move(stringToPublish)
 
@@ -66,7 +66,7 @@ class RoamerMover:
         #if clear both left and right, turnspeed == 0 but forwardspeed == 2
 
         if turnSpeed == 0 and forwardSpeed == 0: # If not clear in any direction, turn on the spot
-            turnSpeed = 1.57
+            turnSpeed += self.turnRate
 
         twist = Twist()
         twist.linear.x = forwardSpeed
