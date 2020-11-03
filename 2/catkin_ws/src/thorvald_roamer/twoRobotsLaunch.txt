@@ -1,0 +1,1 @@
+roslaunch uol_cmp9767m_base thorvald-sim.launch obstacles:=false second_robot:=true fake_localisation:=true
