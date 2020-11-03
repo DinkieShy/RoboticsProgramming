@@ -32,11 +32,13 @@ class Looker():
         mask = cv2.inRange(image, lowerGreen, upperGreen) # binary mask, same size as image, 1 indicates a pixel between the bounds
         image = cv2.bitwise_and(image, image, mask=mask) # bitwise and to only keep pixels that fit in the filter
 
-        image = cv2.resize(image, (msg.width/3, msg.height/3)) # resize for sake of fitting on one screen
-        cv2.namedWindow("Image_" + self.id)
-        cv2.imshow("Image_" + self.id, cv2.cvtColor(image, cv2.COLOR_HSV2BGR))
+        # image = cv2.resize(image, (msg.width/3, msg.height/3)) # resize for sake of fitting on one screen
+        # cv2.namedWindow("Image_" + self.id)
+        # cv2.imshow("Image_" + self.id, cv2.cvtColor(image, cv2.COLOR_HSV2BGR))
 
-        cv2.waitKey(1)
+        # cv2.waitKey(1)
+
+        self.camPub.publish(self.bridge.cv2_to_imgmsg(cv2.cvtColor(image, cv2.COLOR_HSV2BGR), 'bgr8')) # Convert image back to bgr8 image msg, then publish
 
         # print(np.sum(mask)) # Print number of matched pixels for sanity check
         if np.sum(mask) > 100000: # If enough pixels fit in the filter
