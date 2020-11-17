@@ -20,8 +20,8 @@ class RoamerMover:
         self.closestPointPub = rospy.Publisher("/thorvald_" + id + "/closestPoint", PoseStamped, queue_size=0)
         self.forwardRate = (2)
         self.turnRate = (math.pi/2)/2
-        self.stopSub = rospy.Subscriber("/thorvald_" + id + "/STOP", Bool, self.stopCB)
-        self.stop = False
+        self.stopSub = rospy.Subscriber("camera/STOP", Bool, self.stopCB)
+        self.stop = False # Default to false
 
     def stopCB(self, msg):
         self.stop = msg.data
@@ -81,6 +81,8 @@ class RoamerMover:
             twist.angular.z = turnSpeed
 
             self.twistPub.publish(twist)
+        else:
+            self.twitstPub.publish(Twist()) #Publish "0 0 0, 0 0 0" if stop command received
 
 thorvaldID = str(sys.argv[1]) if len(sys.argv) > 1 else "001"
 rospy.init_node("roamer_" + thorvaldID)
